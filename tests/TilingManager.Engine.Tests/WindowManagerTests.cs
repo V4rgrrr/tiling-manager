@@ -17,13 +17,12 @@ public class WindowManagerTests
         // Assert
         Assert.NotEqual(IntPtr.Zero, windowHandle);
         
-        // Cleanup - not working ...
+        // Cleanup
         if (windowHandle != IntPtr.Zero)
         {
-            Process processToKill = Process.GetProcessById((int)windowHandle);
-            
+            int processId = windowManager.GetProcessIdFromWindowHandle(windowHandle);
+            Process processToKill = Process.GetProcessById((int)processId);
             processToKill.Kill();
-            
             processToKill.WaitForExit();
         }
     }
