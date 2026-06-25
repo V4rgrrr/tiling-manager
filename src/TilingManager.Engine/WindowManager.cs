@@ -5,19 +5,6 @@ namespace TilingManager.Engine;
 
 public class WindowManager
 {
-    // Win32 API
-    private delegate bool EnumWindowsProc(IntPtr hWnd, IntPtr lParam);
-    
-    [DllImport("user32.dll")]
-    private static extern bool EnumWindows(EnumWindowsProc lpEnumProc, IntPtr lParam);
-    
-    [DllImport("user32.dll")]
-    private static extern uint GetWindowThreadProcessId(IntPtr hWnd, out uint lpdwProcessId);
-    
-    [DllImport("user32.dll")]
-    private static extern bool IsWindowVisible(IntPtr hWnd);
-    
-    
     public IntPtr LaunchAppAndGetHandle(string executablePath)
     {
         string processName = Path.GetFileNameWithoutExtension(executablePath);
@@ -52,7 +39,7 @@ public class WindowManager
     
     public int GetProcessIdFromWindowHandle(IntPtr windowHandle)
     {
-        GetWindowThreadProcessId(windowHandle, out uint processId);
+        NativeMethods.GetWindowThreadProcessId(windowHandle, out uint processId);
         return (int)processId;
     }
 
@@ -63,14 +50,18 @@ public class WindowManager
         
         Process[] processes = Process.GetProcessesByName(processName);
         HashSet<uint> pids = new HashSet<uint>();
-        foreach (var p in processes)
-            pids.Add((uint)p.Id);
 
-        EnumWindows(delegate(IntPtr hWnd, IntPtr lParam)
+        foreach (var p in processes)
         {
-            if (IsWindowVisible(hWnd))
+            pids.Add((uint)p.Id);
+            p.Dispose();
+        }
+
+        NativeMethods.EnumWindows(delegate(IntPtr hWnd, IntPtr lParam)
+        {
+            if (NativeMethods.IsWindowVisible(hWnd))
             {
-                GetWindowThreadProcessId(hWnd, out uint windowPid);
+                NativeMethods.GetWindowThreadProcessId(hWnd, out uint windowPid);
                 if (pids.Contains(windowPid))
                 {
                     windows.Add(hWnd);
@@ -81,5 +72,20 @@ public class WindowManager
         }, IntPtr.Zero);
         
         return windows;
+    }
+    
+    private static class NativeMethods
+    {
+        // Win32 API
+        public delegate bool EnumWindowsProc(IntPtr hWnd, IntPtr lParam);
+    
+        [DllImport("user32.dll")]
+        public static extern bool EnumWindows(EnumWindowsProc lpEnumProc, IntPtr lParam);
+    
+        [DllImport("user32.dll")]
+        public static extern uint GetWindowThreadProcessId(IntPtr hWnd, out uint lpdwProcessId);
+    
+        [DllImport("user32.dll")]
+        public static extern bool IsWindowVisible(IntPtr hWnd);
     }
 }
