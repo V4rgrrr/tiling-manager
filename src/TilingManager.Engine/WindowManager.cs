@@ -36,6 +36,14 @@ public class WindowManager
         
         return newWindowHandle;
     }
+
+    public bool SetWindowPosition(IntPtr windowHandle, int x, int y, int width, int height)
+    {
+        if (windowHandle == IntPtr.Zero)
+            return false;
+        
+        return NativeMethods.MoveWindow(windowHandle, x, y, width, height, true);
+    }
     
     public int GetProcessIdFromWindowHandle(IntPtr windowHandle)
     {
@@ -87,5 +95,8 @@ public class WindowManager
     
         [DllImport("user32.dll")]
         public static extern bool IsWindowVisible(IntPtr hWnd);
+        
+        [DllImport("user32.dll", SetLastError = true)]
+        public static extern bool MoveWindow(IntPtr hWnd, int X, int Y, int nWidth, int nHeight, bool bRepaint);
     }
 }
