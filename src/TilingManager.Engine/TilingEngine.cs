@@ -22,4 +22,30 @@ public class TilingEngine
         
         return _windowManager.SetWindowPosition(windowHandle, x, y, width, height);
     }
+    
+    // TileAllWindows
+    public bool ApplyLayout(Layout layout, IList<IntPtr> windowHandles)
+    {
+        if (layout == null || windowHandles == null || windowHandles.Count == 0)
+            return false;
+        
+        int windowsToTile = Math.Min(layout.Zones.Count, windowHandles.Count);
+        
+        bool overallSuccess = true;
+
+        for (int i = 0; i < windowsToTile; i++)
+        {
+            IntPtr currentWindow = windowHandles[i];
+            Zone currentZone = layout.Zones[i];
+            
+            bool sucess = TileWindow(currentWindow, currentZone);
+
+            if (!sucess)
+            {
+                overallSuccess = false;
+            }
+        }
+        
+        return overallSuccess;
+    } 
 }
