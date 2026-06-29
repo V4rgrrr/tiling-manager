@@ -10,12 +10,15 @@ public class WindowManager
         string processName = Path.GetFileNameWithoutExtension(executablePath);
         
         HashSet<IntPtr> existingWindows = GetVisibleWindowsForProcessName(processName);
-        
-        Process.Start(executablePath);
-        
+    
+        using Process newProcess = Process.Start(executablePath);
+        if (newProcess == null)
+            return IntPtr.Zero;
+    
         IntPtr newWindowHandle = IntPtr.Zero;
+        int maxAttempts = 50;
 
-        for (int i = 0; i < 50; i++)
+        for (int i = 0; i < maxAttempts; i++)
         {
             HashSet<IntPtr> currentWindows = GetVisibleWindowsForProcessName(processName);
 
@@ -30,13 +33,13 @@ public class WindowManager
 
             if (newWindowHandle != IntPtr.Zero)
                 break;
-            
+        
             Thread.Sleep(100);
         }
-        
+    
         return newWindowHandle;
     }
-
+    
     public bool SetWindowPosition(IntPtr windowHandle, int x, int y, int width, int height)
     {
         if (windowHandle == IntPtr.Zero)
@@ -50,7 +53,6 @@ public class WindowManager
         NativeMethods.GetWindowThreadProcessId(windowHandle, out uint processId);
         return (int)processId;
     }
-
 
     private static HashSet<IntPtr> GetVisibleWindowsForProcessName(string processName)
     {

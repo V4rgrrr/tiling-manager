@@ -29,7 +29,7 @@ public class PredefinedLayouts
         Zones = new List<Zone>()
         {
             new Zone() { X = 0.0, Y = 0.0, Width = 0.5, Height = 0.5 }, // Left Top (Stack)
-            new Zone() { X = 0.5, Y = 0.5, Width = 0.5, Height = 0.5 }, // Bottom Left (Stack)
+            new Zone() { X = 0.0, Y = 0.5, Width = 0.5, Height = 0.5 }, // Bottom Left (Stack)
             new Zone() { X = 0.5, Y = 0.0, Width = 0.5, Height = 1.0 } // Right (Master)
         }
     };
